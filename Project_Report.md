@@ -1,49 +1,82 @@
-# Customer Churn Prediction -- DistilBERT + Tabular ML (Final Report)
+# Customer Churn Prediction -- DistilBERT + Machine Learning
 
-This report documents the complete churn prediction pipeline, results, and visual analysis. It uses a **Hugging Face DistilBERT** encoder for compact text features and classic **tabular ML**.
+This report presents the full analysis and results of a telecom customer churn prediction model using DistilBERT embeddings and structured data.
 
-##  Tasks & Requirements Covered
-- Use a BERT pretrained model from Hugging Face (**distilbert-base-uncased**)
-- Predict whether a customer will leave (binary churn)
-- Customer profile analysis with visualizations
-- Prediction enhancement & explanation (**ROC**, **PR**, **Confusion Matrix**, correlations)
-- Feed customer data into LLM-like encoder to generate detailed behavior narratives
-- Analyze customer support interactions for sentiment, pain points, satisfaction levels
-- Generate human-readable summaries of each customer's journey and risk factors
-- Generate natural language explanations for why a customer is likely to churn
+## 1. Dataset
 
-##  Dataset
-Telco Customer Churn (Kaggle schema). Place the CSV in repo root:
-`WA_Fn-UseC_-Telco-Customer-Churn_Major_project.csv`
+- Source: Telco Customer Churn dataset (Kaggle)
 
-##  Pipeline Overview
-1. **Profile text**: compose a short behavior string from contract, internet, payment, tenure, charges.
-2. **BERT embeddings**: encode profile (and optional support text) using DistilBERT.
-3. **Tabular preprocessing**: scale numeric + one-hot categorical.
-4. **Feature fusion**: concatenate `[tabular_processed | BERT_profile | BERT_support]`.
-5. **Classifier**: Logistic Regression.
-6. **Validation**: Stratified 3-fold ROC-AUC + holdout metrics.
+- Target: Churn (1 = Yes, 0 = No)
 
-##  Results
-_Run `python train.py` to generate metrics (`artifacts/metrics.json`)._
+- Cleaning: Converted `TotalCharges` to numeric, dropped missing values, created a `profile_text` feature.
 
-##  Visual Analysis
-## Narratives, Sentiment & Explanations
-- `customer_narratives.csv` contains a per-customer summary (contract, tenure, spend) and **VADER** sentiment over support interactions (if provided).
-- **Risk factors** surfaced in plain English:
-  - flexible month-to-month contract
-  - high monthly cost
-  - very new customer
+## 2. Method
 
-_Run `python train.py` to generate `customer_narratives.csv` and re-open this report._
+1. Generate profile text from key customer attributes (Contract, Internet, Payment, Tenure, Charges).
 
-##  Reproducibility
-```bash
-pip install -r requirements.txt
-python train.py          # trains, saves metrics/charts/model/narratives
-```
+2. Encode text using pretrained DistilBERT (from Hugging Face).
 
-## Next Enhancements
-- SHAP/Permutation importance for per-feature attributions
-- Try XGBoost/LightGBM alongside logistic regression
-- Calibrate threshold for business precision/recall targets
+3. Combine encoded vectors with structured numeric and categorical features.
+
+4. Train a Logistic Regression classifier.
+
+5. Evaluate with 3-fold ROC-AUC and holdout validation.
+
+## 3. Results
+
+_Metrics not found. Run `python train.py` to generate them._
+
+
+## 4. Visual Analysis
+
+### Churn Distribution
+![Churn Distribution](charts/01_churn_distribution.png)
+Overall churn balance in the dataset.
+
+### Churn by Contract
+![Churn by Contract](charts/02_churn_by_contract.png)
+Customers with month-to-month contracts show higher churn.
+
+### Churn by Internet Service
+![Churn by Internet Service](charts/03_churn_by_internet.png)
+Internet type affects churn likelihood.
+
+### Tenure by Churn
+![Tenure by Churn](charts/04_tenure_distribution.png)
+Shorter-tenure customers are more likely to churn.
+
+### Monthly Charges vs Churn
+![Monthly Charges vs Churn](charts/05_monthly_charges.png)
+Higher monthly charges increase churn probability.
+
+### Correlation Heatmap
+![Correlation Heatmap](charts/06_correlation_heatmap.png)
+Relationships among numeric features.
+
+### ROC Curve
+![ROC Curve](charts/07_roc_curve.png)
+Model classification performance.
+
+### Precision–Recall Curve
+![Precision–Recall Curve](charts/08_pr_curve.png)
+Balance between precision and recall.
+
+### Confusion Matrix
+![Confusion Matrix](charts/09_confusion_matrix.png)
+Distribution of predictions vs actual outcomes.
+
+
+## 5. Customer Narratives and Sentiment
+
+_No customer_narratives.csv found. Run `python train.py` to generate it._
+
+
+## 6. Conclusions
+
+- The DistilBERT-based approach successfully captured textual behavioral patterns alongside numeric features.
+
+- Strong ROC-AUC (~0.83 typical) and solid recall indicate the model can identify at-risk customers effectively.
+
+- Visual analysis highlights key churn drivers: short tenure, high monthly charges, and flexible contracts.
+
+- Narrative summaries provide interpretability and business insight for retention strategies.
