@@ -11,12 +11,8 @@ __pycache__/
 
 # raw data (keep local; not in git)
 WA_Fn-UseC_-Telco-Customer-Churn_Major_project.csv
-support_interactions.csv  # optional extra data
+support_interactions.csv
 
-# notebooks / checkpoints
-*.ipynb
-*.ipynb_checkpoints
-
-# large model caches (local only)
+# caches
 cache/
 outputs/

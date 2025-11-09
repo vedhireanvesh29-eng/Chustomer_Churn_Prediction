@@ -1,13 +1,13 @@
 import torch
 from transformers import AutoTokenizer, AutoModel
 import numpy as np
+from typing import List
+
 
 class BertEncoder:
-    """
-    Lightweight sentence embedding using a BERT-family model (no fine-tuning).
-    Mean-pools last hidden state. Works offline after first download.
-    """
-    def __init__(self, model_name="distilbert-base-uncased", device=None):
+    """DistilBERT sentence embeddings via mean pooling."""
+
+    def __init__(self, model_name: str = "distilbert-base-uncased", device: str | None = None):
         self.model_name = model_name
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModel.from_pretrained(model_name)
@@ -16,18 +16,20 @@ class BertEncoder:
         self.model.to(self.device)
 
     @torch.no_grad()
-    def encode(self, texts, batch_size=32, max_length=128):
-        embs = []
-        for i in range(0, len(texts), batch_size):
-            batch = texts[i:i+batch_size]
+    def encode(self, texts: List[str], batch_size: int = 32, max_length: int = 128) -> np.ndarray:
+        embs: list[np.ndarray] = []
+        for start in range(0, len(texts), batch_size):
+            batch = texts[start : start + batch_size]
             toks = self.tokenizer(
-                batch, padding=True, truncation=True, max_length=max_length, return_tensors="pt"
+                batch,
+                padding=True,
+                truncation=True,
+                max_length=max_length,
+                return_tensors="pt",
             ).to(self.device)
-            out = self.model(**toks).last_hidden_state   # [B, L, H]
-            mask = toks['attention_mask'].unsqueeze(-1).expand(out.size()).float()
-            masked = out * mask
-            summed = masked.sum(1)
+            hidden = self.model(**toks).last_hidden_state
+            mask = toks["attention_mask"].unsqueeze(-1).expand(hidden.size()).float()
+            summed = (hidden * mask).sum(1)
             counts = mask.sum(1).clamp(min=1e-9)
-            mean_pooled = summed / counts
-            embs.append(mean_pooled.cpu().numpy())
+            embs.append((summed / counts).cpu().numpy())
         return np.vstack(embs)
