@@ -1,0 +1,22 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+__pycache__/
+*.pyc
+
+# env
+.venv/
+.env
+
+# raw data (keep local; not in git)
+WA_Fn-UseC_-Telco-Customer-Churn_Major_project.csv
+support_interactions.csv  # optional extra data
+
+# notebooks / checkpoints
+*.ipynb
+*.ipynb_checkpoints
+
+# large model caches (local only)
+cache/
+outputs/
